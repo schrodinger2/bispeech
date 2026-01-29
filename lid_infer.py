@@ -1,8 +1,7 @@
 import joblib
 import sounddevice as sd
-import numpy as np
+from lid import extract_features
 from scipy.io.wavfile import write
-
 
 SAMPLE_RATE = 16000
 DURATION = 15  # seconds
@@ -30,10 +29,8 @@ write(src, SAMPLE_RATE,audio[i* SAMPLE_RATE:-1])
 clf = joblib.load("lid_model.joblib")
 
 
-
-
 for j in range(0,i,2):
-    pred = clf.predict(f"audio/input{j}.wav")
-
+    feats = extract_features(f"data/AR/{i}.flac")
+    pred = clf.predict(feats)
     print(pred)
 

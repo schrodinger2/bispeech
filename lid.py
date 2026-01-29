@@ -18,7 +18,14 @@ def extract_features(path, sr=16000, n_mfcc=13, duration=3.0):
         audio = np.pad(audio, (0, max(0, n_samples - len(audio))), mode='constant')
 
     mfcc = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=n_mfcc)
-    features = np.concatenate([np.mean(mfcc, axis=1), np.std(mfcc, axis=1)])
+    delta = librosa.feature.delta(mfcc)
+    delta2 = librosa.feature.delta(mfcc, order=2)
+
+    features = np.concatenate([
+        mfcc.mean(axis=1), mfcc.std(axis=1),
+        delta.mean(axis=1), delta.std(axis=1),
+        delta2.mean(axis=1), delta2.std(axis=1)
+    ])
     return features
 
 # def extract_features(path, sr=16000, n_mfcc=13):
@@ -49,6 +56,12 @@ for i in range(1,ns):
     feats = extract_features(f"data/EN/{i}.flac")
     X.append(feats)
     y.append(1)
+
+for i in range(2601,2900): # additional traing data for en since it performed worse
+    feats = extract_features(f"data/EN/{i}.flac")
+    X.append(feats)
+    y.append(1)
+
 
 X = np.array(X)
 y = np.array(y)
